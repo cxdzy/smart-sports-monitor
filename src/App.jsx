@@ -72,7 +72,7 @@ const App = () => {
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch("https://mqtt-server-js.fly.dev/data");
+        const res = await fetch("https://mqtt-server-js-porh-a.fly.dev/data");
         const json = await res.json();
 
         if (json.airTemp !== undefined) {
