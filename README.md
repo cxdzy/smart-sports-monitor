@@ -4,6 +4,7 @@ This project uses React with Vite for the frontend dashboard.
 It is part of an IoT-based Smart Sports Monitor system and is still under development.
 
 Some features, integrations, and documentation are not finalized yet.
+U may access it using this smart-sports-monitor.vercel.app
 
 ---
 
