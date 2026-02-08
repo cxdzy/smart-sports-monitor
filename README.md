@@ -1,9 +1,12 @@
-# Smart Sports Monitor (Work in Progress)
+# Smart Outdoor Sports Monitor
 
-This project uses React with Vite for the frontend dashboard.  
-It is part of an IoT-based Smart Sports Monitor system and is still under development.
+## Overview
 
-Some features, integrations, and documentation are not finalized yet.
+Smart Outdoor Sports Monitor is an IoT-based safety monitoring system designed to protect athletes from heat-related risks in outdoor sports environments. The system continuously measures air temperature, ground surface temperature, humidity, and sunlight intensity, then evaluates field safety conditions in real time.
+
+Sensor data is transmitted via MQTT to a Node.js backend server and logged to ThingSpeak for cloud analytics and historical monitoring. The system provides instant visual feedback through an local display and supports remote monitoring through web-based dashboards.
+
+This project was successfully demonstrated in a live exhibition setting, showcasing stable real-time data transmission, cloud integration, and intelligent safety evaluation.
 
 ---
 
@@ -97,13 +100,57 @@ Clone and run the MQTT server:
 git clone https://github.com/cxdzy/mqtt-server-js
 cd mqtt-server-js
 npm install
-Run the development server:
+npm start
+```
 
-bash
-Copy code
-npm run dev
-Open your browser and access:
+### ThingSpeak Configuration
 
-arduino
-Copy code
-http://localhost:5173
+1. Create a ThingSpeak channel
+2. Configure API keys in the server environment
+3. Map sensor fields correctly
+
+---
+
+## Demonstration Results
+
+During exhibition testing:
+
+* Continuous real-time data transmission was achieved
+* ThingSpeak successfully logged long-term sensor data
+* Safety logic responded accurately to environmental changes
+* The system operated reliably under live demonstration conditions
+
+---
+
+## Technologies Used
+
+* ESP32 microcontroller
+* Arduino framework
+* Node.js
+* MQTT protocol
+* Express.js
+* ThingSpeak cloud platform
+* JavaScript
+* Embedded C/C++
+
+---
+
+## Future Improvements
+
+* Mobile application integration
+* Advanced predictive heat analysis
+* Automated notification system
+* Expanded sensor network coverage
+* Machine learning-based safety prediction
+
+---
+
+## Author
+
+Developed by Haziq Naqib as part of an Smart IoT campus safety project.
+
+---
+
+## License
+
+This project is for academic and educational purposes.
