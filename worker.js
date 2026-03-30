@@ -2,38 +2,6 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (url.pathname === '/api/weather-debug') {
-      const envWeather = Boolean(env.WEATHER_API_KEY);
-      const envVite = Boolean(env.VITE_WEATHER_API_KEY);
-      const processWeather = Boolean(process?.env?.WEATHER_API_KEY);
-      const processVite = Boolean(process?.env?.VITE_WEATHER_API_KEY);
-
-      return new Response(
-        JSON.stringify(
-          {
-            ok: true,
-            sources: {
-              env: {
-                WEATHER_API_KEY: envWeather,
-                VITE_WEATHER_API_KEY: envVite
-              },
-              processEnv: {
-                WEATHER_API_KEY: processWeather,
-                VITE_WEATHER_API_KEY: processVite
-              }
-            },
-            anyKeyFound: envWeather || envVite || processWeather || processVite
-          },
-          null,
-          2
-        ),
-        {
-          status: 200,
-          headers: { 'content-type': 'application/json; charset=utf-8' }
-        }
-      );
-    }
-
     if (url.pathname === '/api/weather') {
       if (request.method !== 'GET') {
         return new Response(JSON.stringify({ error: { message: 'Method not allowed.' } }), {
