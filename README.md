@@ -110,6 +110,22 @@ If any threshold is exceeded, the system sets the status to **UNSAFE**, activate
 
 ## Installation and Setup
 
+### Cloudflare Environment (Wrangler)
+
+For local Cloudflare development with Wrangler:
+
+```bash
+cp .dev.vars.example .dev.vars
+```
+
+Then set your key in `.dev.vars`:
+
+```dotenv
+VITE_WEATHER_API_KEY=your_weatherapi_key_here
+```
+
+For CI/production builds on Cloudflare, add `VITE_WEATHER_API_KEY` as an environment variable in your Cloudflare project settings.
+
 ### Hardware Setup
 
 1. Connect all sensors and peripherals to the ESP32 according to the circuit design
