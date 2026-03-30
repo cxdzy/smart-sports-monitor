@@ -180,7 +180,7 @@ const App = () => {
 
       try {
         const query = encodeURIComponent(selectedWeatherLocation.query);
-        const useDirectClientKey = typeof CLIENT_WEATHER_API_KEY === 'string' && CLIENT_WEATHER_API_KEY.trim().length > 0;
+        const useDirectClientKey = !import.meta.env.PROD && typeof CLIENT_WEATHER_API_KEY === 'string' && CLIENT_WEATHER_API_KEY.trim().length > 0;
         const endpoint = useDirectClientKey
           ? `https://api.weatherapi.com/v1/forecast.json?key=${CLIENT_WEATHER_API_KEY}&q=${query}&days=1&aqi=no`
           : `/api/weather?q=${query}&days=1`;
