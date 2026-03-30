@@ -3,6 +3,8 @@ import {
   Thermometer, 
   Droplets, 
   Sun, 
+  Wind,
+  MapPin,
   Waves, 
   Activity, 
   AlertTriangle, 
@@ -12,6 +14,7 @@ import {
   TrendingUp,
   History,
   CloudSun,
+  ChevronDown,
   Timer,
   Info,
   Clock
@@ -26,6 +29,82 @@ import {
   Area 
 } from 'recharts';
 
+const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
+
+const WEATHER_LOCATIONS = [
+  { id: 'WLY01', name: 'Kuala Lumpur & Putrajaya', query: 'Kuala Lumpur' },
+  { id: 'WLY02', name: 'Labuan', query: 'Labuan' },
+  { id: 'SGR01', name: 'Gombak, Petaling, Sepang, Hulu Langat, Hulu Selangor, S.Alam', query: 'Shah Alam' },
+  { id: 'SGR02', name: 'Kuala Selangor, Sabak Bernam', query: 'Kuala Selangor' },
+  { id: 'SGR03', name: 'Klang, Kuala Langat', query: 'Klang' },
+  { id: 'JHR01', name: 'Pulau Aur & Pulau Pemanggil', query: 'Mersing' },
+  { id: 'JHR02', name: 'Johor Bahru, Kota Tinggi, Mersing', query: 'Johor Bahru' },
+  { id: 'JHR03', name: 'Kluang, Pontian', query: 'Kluang' },
+  { id: 'JHR04', name: 'Batu Pahat, Muar, Segamat, Gemas', query: 'Batu Pahat' },
+  { id: 'KDH01', name: 'Kota Setar, Kubang Pasu, Pokok Sena', query: 'Alor Setar' },
+  { id: 'KDH02', name: 'Kuala Muda, Yan, Pendang', query: 'Sungai Petani' },
+  { id: 'KDH03', name: 'Padang Terap, Sik', query: 'Sik' },
+  { id: 'KDH04', name: 'Baling', query: 'Baling' },
+  { id: 'KDH05', name: 'Bandar Baharu, Kulim', query: 'Kulim' },
+  { id: 'KDH06', name: 'Langkawi', query: 'Langkawi' },
+  { id: 'KDH07', name: 'Gunung Jerai', query: 'Gurun' },
+  { id: 'KTN01', name: 'Kota Bharu, Bachok, Pasir Puteh, Tumpat, Pasir Mas, dll', query: 'Kota Bharu' },
+  { id: 'KTN02', name: 'Gua Musang, Jeli, Lojing', query: 'Gua Musang' },
+  { id: 'MLK01', name: 'Seluruh Negeri Melaka', query: 'Malacca' },
+  { id: 'NSN01', name: 'Tampin, Jempol', query: 'Tampin' },
+  { id: 'NSN02', name: 'Seremban, Port Dickson, Kuala Pilah, Jelebu, Rembau', query: 'Seremban' },
+  { id: 'PHG01', name: 'Pulau Tioman', query: 'Tioman' },
+  { id: 'PHG02', name: 'Kuantan, Pekan, Rompin, Muadzam Shah', query: 'Kuantan' },
+  { id: 'PHG03', name: 'Jerantut, Temerloh, Maran, Bera, Jengka', query: 'Temerloh' },
+  { id: 'PHG04', name: 'Bentong, Lipis, Raub', query: 'Bentong' },
+  { id: 'PHG05', name: 'Genting Sempah, Janda Baik, Bukit Tinggi', query: 'Bukit Tinggi' },
+  { id: 'PHG06', name: 'Cameron Highlands, Genting Highlands, Bukit Fraser', query: 'Cameron Highlands' },
+  { id: 'PRK01', name: 'Tapah, Slim River, Tanjung Malim', query: 'Tapah' },
+  { id: 'PRK02', name: 'Ipoh, Kuala Kangsar, Sg. Siput, Batu Gajah, Kampar', query: 'Ipoh' },
+  { id: 'PRK03', name: 'Lenggong, Pengkalan Hulu, Gerik', query: 'Gerik' },
+  { id: 'PRK04', name: 'Temengor, Belum', query: 'Gerik' },
+  { id: 'PRK05', name: 'Teluk Intan, Lumut, Sitiawan, Kg Gajah, dll', query: 'Teluk Intan' },
+  { id: 'PRK06', name: 'Taiping, Bagan Serai, Parit Buntar, Selama', query: 'Taiping' },
+  { id: 'PRK07', name: 'Bukit Larut', query: 'Taiping' },
+  { id: 'PLS01', name: 'Seluruh Negeri Perlis', query: 'Kangar' },
+  { id: 'PNG01', name: 'Seluruh Negeri Pulau Pinang', query: 'Georgetown' },
+  { id: 'SBH01', name: 'Sandakan (Timur), Bukit Garam, dll', query: 'Sandakan' },
+  { id: 'SBH02', name: 'Beluran, Telupid, Pinangah, dll', query: 'Beluran' },
+  { id: 'SBH03', name: 'Lahad Datu, Silabukan, Tungku, Semporna', query: 'Lahad Datu' },
+  { id: 'SBH04', name: 'Bandar Tawau, Balong, Merotai, Kalabakan', query: 'Tawau' },
+  { id: 'SBH05', name: 'Kudat, Kota Marudu, Pitas, Pulau Banggi', query: 'Kudat' },
+  { id: 'SBH06', name: 'Gunung Kinabalu', query: 'Ranau' },
+  { id: 'SBH07', name: 'Kota Kinabalu, Penampang, Papar, Putatan, dll', query: 'Kota Kinabalu' },
+  { id: 'SBH08', name: 'Pensiangan, Keningau, Tambunan, Nabawan', query: 'Keningau' },
+  { id: 'SBH09', name: 'Beaufort, Kuala Penyu, Sipitang, Tenom, dll', query: 'Beaufort' },
+  { id: 'SWK01', name: 'Limbang, Lawas, Sundar, Trusan', query: 'Limbang' },
+  { id: 'SWK02', name: 'Miri, Niah, Bekenu, Sibuti, Marudi', query: 'Miri' },
+  { id: 'SWK03', name: 'Pandan, Belaga, Suai, Tatau, Bintulu', query: 'Bintulu' },
+  { id: 'SWK04', name: 'Sibu, Mukah, Dalat, Song, Igan, Oya, dll', query: 'Sibu' },
+  { id: 'SWK05', name: 'Sarikei, Matu, Julau, Rajang, Daro, dll', query: 'Sarikei' },
+  { id: 'SWK06', name: 'Lubok Antu, Sri Aman, Betong, Saratok, dll', query: 'Sri Aman' },
+  { id: 'SWK07', name: 'Serian, Simunjan, Samarahan, Sebuyau, dll', query: 'Serian' },
+  { id: 'SWK08', name: 'Kuching, Bau, Lundu, Sematan', query: 'Kuching' }
+];
+
+const WEATHER_STATE_BY_PREFIX = {
+  WLY: 'Wilayah Persekutuan',
+  SGR: 'Selangor',
+  JHR: 'Johor',
+  KDH: 'Kedah',
+  KTN: 'Kelantan',
+  MLK: 'Melaka',
+  NSN: 'Negeri Sembilan',
+  PHG: 'Pahang',
+  PRK: 'Perak',
+  PLS: 'Perlis',
+  PNG: 'Pulau Pinang',
+  SBH: 'Sabah',
+  SWK: 'Sarawak'
+};
+
+const getWeatherState = (locationId) => WEATHER_STATE_BY_PREFIX[locationId.slice(0, 3)] || 'Lain-lain';
+
 const App = () => {
   /* ================= STATE ================= */
   const [data, setData] = useState({
@@ -39,6 +118,10 @@ const App = () => {
   const [isSimulation, setIsSimulation] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
   const [history, setHistory] = useState([]);
+  const [selectedWeatherLocation, setSelectedWeatherLocation] = useState(WEATHER_LOCATIONS[0]);
+  const [weatherData, setWeatherData] = useState(null);
+  const [weatherLoading, setWeatherLoading] = useState(false);
+  const [weatherError, setWeatherError] = useState('');
   
   /* ================= DATA HANDLING (SIM & REAL) ================= */
   useEffect(() => {
@@ -89,6 +172,45 @@ const App = () => {
     return () => clearInterval(interval);
   }, [isSimulation]);
 
+  /* ================= LIVE WEATHER UPDATE ================= */
+  useEffect(() => {
+    const fetchWeather = async () => {
+      if (!WEATHER_API_KEY) {
+        setWeatherData(null);
+        return;
+      }
+
+      setWeatherLoading(true);
+      setWeatherError('');
+
+      try {
+        const res = await fetch(
+          `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${encodeURIComponent(selectedWeatherLocation.query)}&days=1&aqi=no`
+        );
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        const json = await res.json();
+
+        if (json.error) {
+          setWeatherError(typeof json.error.message === 'string' ? json.error.message : 'Failed to fetch weather data.');
+          setWeatherData(null);
+        } else {
+          setWeatherData(json);
+        }
+      } catch {
+        setWeatherError('Unable to connect to weather service.');
+        setWeatherData(null);
+      } finally {
+        setWeatherLoading(false);
+      }
+    };
+
+    fetchWeather();
+  }, [selectedWeatherLocation]);
+
   /* ================= SAFETY & WEATHER LOGIC ================= */
   const safetyStatus = useMemo(() => {
     const isHotAir = data.airTemp > 35;
@@ -134,6 +256,24 @@ const App = () => {
     if (data.sunlight < 200 && data.humidity > 70) return "Overcast / Potential Rain";
     return "Clear Sky";
   }, [data]);
+
+  const weatherHours = useMemo(() => {
+    const hours = weatherData?.forecast?.forecastday?.[0]?.hour || [];
+    const nowEpoch = Math.floor(Date.now() / 1000);
+    return hours
+      .filter((hour) => hour.time_epoch >= nowEpoch - 3600)
+      .slice(0, 8);
+  }, [weatherData]);
+
+  const weatherStates = useMemo(
+    () => [...new Set(WEATHER_LOCATIONS.map((loc) => getWeatherState(loc.id)))],
+    []
+  );
+
+  const formatWeatherHour = (dateTimeStr) => {
+    const date = new Date(dateTimeStr);
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
+  };
 
   /* ================= SUB-COMPONENTS ================= */
   const StatCard = ({ title, value, unit, icon: Icon, colorHex, max }) => {
@@ -214,7 +354,7 @@ const App = () => {
                 <Activity className="text-white w-8 h-8" />
              </div>
              <div>
-                <h1 className="text-3xl font-black italic tracking-tighter text-white uppercase leading-none">Smart Outdoor Monitor</h1>
+                <h1 className="text-3xl font-black italic tracking-tighter text-white uppercase leading-none">Smart Outdoor Sport Monitor</h1>
                 <div className="flex items-center gap-3 mt-1.5">
                    <p className="text-zinc-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
                       <CloudSun size={12} className="text-emerald-500" /> {weatherCondition}
@@ -324,6 +464,89 @@ const App = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <CustomChart title="Field Humidity" dataKey="humidity" unit="%" icon={Droplets} hexColor="#06b6d4" />
             <CustomChart title="Solar Load" dataKey="sunlight" unit="Lx" icon={Sun} hexColor="#f59e0b" />
+          </div>
+
+          {/* Weather Update (Placed under graph section) */}
+          <div className="p-8 rounded-3xl bg-zinc-900 border border-zinc-800 shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 blur-[100px] -mr-32 -mt-32 pointer-events-none" />
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-8">
+              <div>
+                <h3 className="text-xl font-black text-white flex items-center gap-3 uppercase tracking-tighter italic">
+                  <CloudSun className="text-blue-400" size={24} /> Live Weather Update
+                </h3>
+                <p className="text-zinc-500 text-sm mt-1">Outdoor weather forecast aligned with training safety decisions</p>
+              </div>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
+                <select
+                  className="bg-black/30 border border-zinc-700 text-zinc-200 rounded-xl pl-10 pr-10 py-2 text-sm font-bold uppercase tracking-wide outline-none focus:border-emerald-500 appearance-none"
+                  value={selectedWeatherLocation.id}
+                  onChange={(e) => setSelectedWeatherLocation(WEATHER_LOCATIONS.find((loc) => loc.id === e.target.value) || WEATHER_LOCATIONS[0])}
+                >
+                  {weatherStates.map((state) => (
+                    <optgroup key={state} label={state} className="bg-zinc-950 text-emerald-400 font-bold">
+                      {WEATHER_LOCATIONS.filter((loc) => getWeatherState(loc.id) === state).map((loc) => (
+                        <option key={loc.id} value={loc.id} className="bg-zinc-900 text-zinc-200 font-normal">
+                          {loc.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none" />
+              </div>
+            </div>
+
+            {!WEATHER_API_KEY ? (
+              <div className="rounded-2xl border border-zinc-800 bg-black/30 p-6 text-center">
+                <p className="text-sm text-zinc-400">Add VITE_WEATHER_API_KEY in your .env file to enable live weather updates.</p>
+              </div>
+            ) : weatherError ? (
+              <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center">
+                <p className="text-sm text-red-300 font-semibold">{weatherError}</p>
+              </div>
+            ) : weatherLoading ? (
+              <div className="space-y-4">
+                <div className="h-28 bg-black/30 rounded-2xl animate-pulse" />
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+                  {Array.from({ length: 8 }).map((_, idx) => (
+                    <div key={idx} className="h-24 bg-black/30 rounded-xl animate-pulse" />
+                  ))}
+                </div>
+              </div>
+            ) : weatherData ? (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <div className="lg:col-span-1 rounded-2xl border border-zinc-800 bg-black/30 p-5">
+                    <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-[0.2em] mb-2">Current Outside Weather</p>
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-5xl font-black italic tracking-tighter text-white">{Math.round(weatherData.current.temp_c)}<span className="text-2xl text-blue-400">°C</span></p>
+                        <p className="text-zinc-400 text-sm mt-1">{weatherData.current.condition.text}</p>
+                      </div>
+                      <img src={`https:${weatherData.current.condition.icon}`} alt="Weather icon" className="w-20 h-20 object-contain" />
+                    </div>
+                    <div className="mt-4 flex gap-4 text-xs font-bold uppercase tracking-wider">
+                      <div className="flex items-center gap-2 text-zinc-300"><Wind size={14} className="text-cyan-400" /> {weatherData.current.wind_kph} km/h</div>
+                      <div className="flex items-center gap-2 text-zinc-300"><Droplets size={14} className="text-blue-400" /> {weatherData.current.humidity}%</div>
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-2 rounded-2xl border border-zinc-800 bg-black/30 p-5">
+                    <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-[0.2em] mb-4">Upcoming Hours</p>
+                    <div className="flex gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                      {weatherHours.map((hour) => (
+                        <div key={hour.time_epoch} className="min-w-[88px] rounded-xl border border-zinc-800 bg-zinc-950/60 p-3 text-center">
+                          <p className="text-[11px] text-zinc-400 font-bold uppercase tracking-wider">{formatWeatherHour(hour.time)}</p>
+                          <img src={`https:${hour.condition.icon}`} alt="Hourly icon" className="w-10 h-10 mx-auto my-1" />
+                          <p className="text-lg font-black text-white leading-none">{Math.round(hour.temp_c)}°</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </div>
 
         </div>
