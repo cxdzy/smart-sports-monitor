@@ -24,7 +24,7 @@ export default {
         });
       }
 
-      const apiKey = env.WEATHER_API_KEY;
+      const apiKey = env.WEATHER_API_KEY || env.VITE_WEATHER_API_KEY;
       if (!apiKey) {
         return new Response(JSON.stringify({ error: { message: 'Weather API key is not configured on server.' } }), {
           status: 500,

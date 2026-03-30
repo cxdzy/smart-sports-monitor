@@ -186,12 +186,12 @@ const App = () => {
           : `/api/weather?q=${query}&days=1`;
 
         const res = await fetch(endpoint);
+        const json = await res.json();
 
         if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
+          const apiMessage = typeof json?.error?.message === 'string' ? json.error.message : `HTTP ${res.status}`;
+          throw new Error(apiMessage);
         }
-
-        const json = await res.json();
 
         if (json.error) {
           setWeatherError(typeof json.error.message === 'string' ? json.error.message : 'Failed to fetch weather data.');
@@ -199,8 +199,8 @@ const App = () => {
         } else {
           setWeatherData(json);
         }
-      } catch {
-        setWeatherError('Unable to connect to weather service.');
+      } catch (err) {
+        setWeatherError(err instanceof Error ? err.message : 'Unable to connect to weather service.');
         setWeatherData(null);
       } finally {
         setWeatherLoading(false);
