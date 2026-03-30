@@ -14,7 +14,7 @@ This project was successfully demonstrated during a public exhibition, showcasin
 
 Web Dashboard (Vercel deployment):
 
-[https://smart-sports-monitor.vercel.app/](https://smart-sports-monitor.vercel.app/)
+[https://smart-sports-monitor.vercel.app/](https://smart-sports-monitor.cxdzy.workers.dev//)
 
 Live backend API endpoint (Fly.io):
 
