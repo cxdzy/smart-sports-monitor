@@ -29,7 +29,7 @@ import {
   Area 
 } from 'recharts';
 
-const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
+const CLIENT_WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 
 const WEATHER_LOCATIONS = [
   { id: 'WLY01', name: 'Kuala Lumpur & Putrajaya', query: 'Kuala Lumpur' },
@@ -175,18 +175,17 @@ const App = () => {
   /* ================= LIVE WEATHER UPDATE ================= */
   useEffect(() => {
     const fetchWeather = async () => {
-      if (!WEATHER_API_KEY) {
-        setWeatherData(null);
-        return;
-      }
-
       setWeatherLoading(true);
       setWeatherError('');
 
       try {
-        const res = await fetch(
-          `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${encodeURIComponent(selectedWeatherLocation.query)}&days=1&aqi=no`
-        );
+        const query = encodeURIComponent(selectedWeatherLocation.query);
+        const useDirectClientKey = typeof CLIENT_WEATHER_API_KEY === 'string' && CLIENT_WEATHER_API_KEY.trim().length > 0;
+        const endpoint = useDirectClientKey
+          ? `https://api.weatherapi.com/v1/forecast.json?key=${CLIENT_WEATHER_API_KEY}&q=${query}&days=1&aqi=no`
+          : `/api/weather?q=${query}&days=1`;
+
+        const res = await fetch(endpoint);
 
         if (!res.ok) {
           throw new Error(`HTTP ${res.status}`);
@@ -497,11 +496,7 @@ const App = () => {
               </div>
             </div>
 
-            {!WEATHER_API_KEY ? (
-              <div className="rounded-2xl border border-zinc-800 bg-black/30 p-6 text-center">
-                <p className="text-sm text-zinc-400">Add VITE_WEATHER_API_KEY in your .env file to enable live weather updates.</p>
-              </div>
-            ) : weatherError ? (
+            {weatherError ? (
               <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center">
                 <p className="text-sm text-red-300 font-semibold">{weatherError}</p>
               </div>

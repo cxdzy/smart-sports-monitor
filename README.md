@@ -121,10 +121,10 @@ cp .dev.vars.example .dev.vars
 Then set your key in `.dev.vars`:
 
 ```dotenv
-VITE_WEATHER_API_KEY=your_weatherapi_key_here
+WEATHER_API_KEY=your_weatherapi_key_here
 ```
 
-For CI/production builds on Cloudflare, add `VITE_WEATHER_API_KEY` as an environment variable in your Cloudflare project settings.
+For Cloudflare production, add `WEATHER_API_KEY` as a Secret in your Worker/Pages project settings. The dashboard uses a server-side `/api/weather` proxy, so the key is not exposed in the frontend bundle.
 
 ### Hardware Setup
 
